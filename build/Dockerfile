@@ -1,4 +1,4 @@
-# Official Dart image for building
+# Stage 1: Build the application
 FROM dart:stable AS build
 
 WORKDIR /app
@@ -12,15 +12,14 @@ COPY . .
 RUN dart pub get --offline
 RUN dart compile exe bin/server.dart -o bin/server
 
-# Use a minimal runtime image
+# Stage 2: Minimal runtime image
 FROM gcr.io/distroless/cc
+
+# Copy compiled binary
 COPY --from=build /app/bin/server /app/bin/server
 
-# Ensure executable permissions
-RUN chmod +x /app/bin/server
-
-# Expose server port
+# Expose the server port
 EXPOSE 8080
 
-# Start server
+# Start the server
 CMD ["/app/bin/server"]
